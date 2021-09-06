@@ -1,5 +1,6 @@
 name: deferred_type
 description: Deferred type for working with asynchronous data.
+homepage: https://github.com/arafatamim/deferred_type
 version: 2.0.0
 
 environment:
