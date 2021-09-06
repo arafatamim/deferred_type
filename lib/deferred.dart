@@ -1,82 +1,92 @@
 abstract class Deferred<T> {
   const Deferred();
-  factory Deferred.success(T result) = Success<T>;
-  factory Deferred.error(Object error, StackTrace? stackTrace) = Error<T>;
-  factory Deferred.inProgress() = InProgress<T>;
-  factory Deferred.idle() = Idle<T>;
+  factory Deferred.success(T result) = _Success<T>;
+  factory Deferred.error(Object error, StackTrace? stackTrace) = _Error<T>;
+  factory Deferred.inProgress() = _InProgress<T>;
+  factory Deferred.idle() = _Idle<T>;
+
+  /// Similar to [when], but doesn't require all callbacks to be specified.
+  /// The [orElse] callback must be provided as a fallback handler.
+  R maybeWhen<R>({
+    R Function(T result)? success,
+    R Function(Object error, StackTrace? stackTrace)? error,
+    R Function()? inProgress,
+    R Function()? idle,
+    required R Function() orElse,
+  }) {
+    if (this is _InProgress) {
+      if (inProgress != null) {
+        return inProgress();
+      } else {
+        return orElse();
+      }
+    } else if (this is _Error) {
+      final err = this as _Error;
+      if (error != null) {
+        return error(err.error, err.stackTrace);
+      } else {
+        return orElse();
+      }
+    } else if (this is _Success) {
+      if (success != null) {
+        return success((this as _Success<T>).results);
+      } else {
+        return orElse();
+      }
+    } else {
+      if (idle != null) {
+        return idle();
+      } else {
+        return orElse();
+      }
+    }
+  }
 
   /// Provides several callbacks for handling common states of async data.
   /// It functions as a rudimentary form of pattern matching.
-  /// - [onIdle] callback is used to match the initial state where the operation hasn't started yet.
-  /// - [onInProgress] is used to handle an ongoing async operation.
-  /// - [onSuccess] is called with the finished successful result.
-  /// - [onError] is to be called when the operation has finished with an [Exception], with an optional [StackTrace].
-  ///
-  /// If all of the above arguments are not provided, then the [orElse] callback must be provided as
-  /// a fallback handler, otherwise a runtime exception will be thrown.
-  R where<R>({
-    R Function(T result)? onSuccess,
-    R Function(Object error, StackTrace? stackTrace)? onError,
-    R Function()? onInProgress,
-    R Function()? onIdle,
-    R Function()? orElse,
+  /// - [idle] callback is used to match the initial state where the operation hasn't started yet.
+  /// - [inProgress] is used to handle an ongoing async operation.
+  /// - [success] is called with the finished successful result.
+  /// - [error] is to be called when the operation has finished with an [Exception],
+  /// with an optional [StackTrace].
+  R when<R>({
+    required R Function(T result) success,
+    required R Function(Object error, StackTrace? stackTrace) error,
+    required R Function() inProgress,
+    required R Function() idle,
   }) {
-    R callFallback() {
-      if (orElse != null) {
-        return orElse.call();
-      } else {
-        throw Exception("Fallback is not provided");
-      }
-    }
-
-    if (this is InProgress) {
-      if (onInProgress != null) {
-        return onInProgress();
-      } else {
-        return callFallback();
-      }
-    } else if (this is Error) {
-      final err = this as Error;
-      if (onError != null) {
-        return onError(err.error, err.stackTrace);
-      } else {
-        return callFallback();
-      }
-    } else if (this is Success) {
-      if (onSuccess != null) {
-        return onSuccess((this as Success<T>).results);
-      } else {
-        return callFallback();
-      }
+    if (this is _InProgress) {
+      return inProgress();
+    } else if (this is _Error) {
+      final err = this as _Error;
+      return error(err.error, err.stackTrace);
+    } else if (this is _Success) {
+      return success((this as _Success<T>).results);
     } else {
-      if (onIdle != null) {
-        return onIdle();
-      } else {
-        return callFallback();
-      }
+      return idle();
     }
   }
 }
 
-class Success<T> extends Deferred<T> {
+class _Success<T> extends Deferred<T> {
   final T _results;
   T get results => _results;
-  const Success(this._results);
+  const _Success(this._results);
 }
 
-class Idle<T> extends Deferred<T> {
-  const Idle();
+class _Idle<T> extends Deferred<T> {
+  const _Idle();
 }
 
-class InProgress<T> extends Deferred<T> {
-  const InProgress();
+class _InProgress<T> extends Deferred<T> {
+  const _InProgress();
 }
 
-class Error<T> extends Deferred<T> {
+class _Error<T> extends Deferred<T> {
   final Object _error;
   final StackTrace? _stackTrace;
 
   Object get error => _error;
   StackTrace? get stackTrace => _stackTrace;
-  const Error(this._error, this._stackTrace);
+  const _Error(this._error, this._stackTrace);
 }

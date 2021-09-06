@@ -19,12 +19,12 @@ import "package:deferred_type/deferred_type.dart";
 
 final futureBuilder = FutureBuilder2<String>(
   future: someFuture,
-  builder: (context, state) => state.where<Widget>(
-    onInProgress: () => const CircularProgressIndicator(),
-    onSuccess: (data) => SomeWidget(data),
-    onError: (error, _stacktrace) => SomeErrorWidget(error),
+  builder: (context, state) => state.maybeWhen<Widget>(
+    inProgress: () => const CircularProgressIndicator(),
+    success: (data) => SomeWidget(data),
+    error: (error, _stacktrace) => SomeErrorWidget(error),
     // handle fallback cases, must be provided 
-    // if all states are not handled, or it throws a runtime exception.
+    // if all states are not handled.
     orElse: () => const FallbackWidget(),
   );
 );
