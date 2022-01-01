@@ -1,5 +1,5 @@
 name: deferred_type
-description: Deferred type for working with asynchronous data.
+description: Deferred type for working with asynchronous data. Comes with an easy-to-use FutureBuilder widget for Flutter.
 homepage: https://github.com/arafatamim/deferred_type
 version: 2.0.0
 
@@ -15,6 +15,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^1.0.0
+  test: ^1.17.10
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
