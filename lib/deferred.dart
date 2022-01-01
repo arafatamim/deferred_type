@@ -5,8 +5,8 @@ abstract class Deferred<T> {
   factory Deferred.inProgress() = _InProgress<T>;
   factory Deferred.idle() = _Idle<T>;
 
-  /// Similar to [when], but doesn't require all callbacks to be specified.
-  /// The [orElse] callback must be provided as a fallback handler.
+  /// Similar to [when], but doesn't require all states to be explicitly handled,
+  /// therefore the [orElse] callback must be provided as a fallback handler.
   R maybeWhen<R>({
     R Function(T result)? success,
     R Function(Object error, StackTrace? stackTrace)? error,
@@ -64,6 +64,36 @@ abstract class Deferred<T> {
       return success((this as _Success<T>).results);
     } else {
       return idle();
+    }
+  }
+
+  Deferred<R> mapSuccess<R>(
+    R Function(T result) f,
+  ) {
+    if (this is _InProgress) {
+      return Deferred.inProgress();
+    } else if (this is _Error) {
+      final err = this as _Error;
+      return Deferred.error(err.error, err.stackTrace);
+    } else if (this is _Success) {
+      final success = this as _Success;
+      return Deferred.success(f(success.results));
+    } else {
+      return Deferred.idle();
+    }
+  }
+
+  Deferred<T> mapError(Object Function(Object error) f) {
+    if (this is _InProgress) {
+      return Deferred.inProgress();
+    } else if (this is _Error) {
+      final err = this as _Error;
+      return Deferred.error(f(err.error), err.stackTrace);
+    } else if (this is _Success) {
+      final success = this as _Success;
+      return Deferred.success(success.results);
+    } else {
+      return Deferred.idle();
     }
   }
 }
