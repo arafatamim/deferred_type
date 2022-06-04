@@ -1,3 +1,6 @@
+## 3.0.0
+* Removed Flutter dependency and `FutureBuilder2` widget.
+
 ## 2.1.0
 * Added `mapSuccess` and `mapError` methods.
 
