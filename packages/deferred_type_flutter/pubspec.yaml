@@ -1,0 +1,20 @@
+name: deferred_type_flutter
+description: Packages for Flutter based on the library deferred_type.
+version: 1.0.0
+homepage: https://github.com/arafatamim/deferred_type
+
+environment:
+  sdk: ">=2.16.0 <3.0.0"
+  flutter: ">=2.10.0"
+
+dependencies:
+  deferred_type: ^3.0.0
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.1
+  test: ^1.21.1
+
