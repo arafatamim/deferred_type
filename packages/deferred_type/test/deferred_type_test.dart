@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:deferred_type/deferred.dart';
+import "package:deferred_type/deferred.dart";
 
 void main() {
   test("should handle state accordingly in when method", () {

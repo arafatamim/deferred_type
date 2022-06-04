@@ -1,9 +1,10 @@
 # deferred_type for Dart
 
-![Pub Version](https://img.shields.io/pub/v/deferred_type?label=dart%20package&logo=dart&style=for-the-badge)
-![GitHub](https://img.shields.io/github/license/arafatamim/deferred_type?logo=git&style=for-the-badge)
+[![Pub Version deferred_type](https://img.shields.io/pub/v/deferred_type?label=deferred_type&logo=dart&style=for-the-badge)](https://pub.dev/packages/deferred_type)
+[![Pub Version deferred_type_flutter](https://img.shields.io/pub/v/deferred_type_flutter?label=deferred_type_flutter&logo=dart&style=for-the-badge)](https://pub.dev/packages/deferred_type_flutter) \
+[![GitHub](https://img.shields.io/github/license/arafatamim/deferred_type?logo=git&style=for-the-badge)](https://github.com/arafatamim/deferred_type)
 
-Modeling asynchronous data made easy. Comes with a `FutureBuilder2` widget for use in Flutter applications.
+Modeling asynchronous data in Dart made easy.
 
 ## Examples
 
@@ -16,10 +17,10 @@ final Deferred<String> error = Deferred.error('ERROR!');
 
 ### Flutter
 
-`FutureBuilder2`, an alternative "FutureBuilder" which is simpler to use than the bundled one provided by default in Flutter.
+Package [deferred_type_flutter](https://pub.dev/packages/deferred_type_flutter) contains `FutureBuilder2`, an alternative "FutureBuilder" which is simpler to use than the bundled one provided by default in Flutter.
 
 ```dart
-import "package:deferred_type/deferred_type.dart";
+import "package:deferred_type_flutter/deferred_type_flutter.dart";
 
 final futureBuilder = FutureBuilder2<String>(
   future: someFuture,
@@ -38,11 +39,6 @@ final futureBuilder = FutureBuilder2<String>(
 
 Detailed API documentation can be found on [pub.dev](https://pub.dev/documentation/deferred_type/latest/deferred_type/deferred_type-library.html).
 
-## Possible to-do
-
-- Version with [fpdart](https://github.com/SandroMaglione/fpdart) integration.
-- Come up with a better name for the FutureBuilder.
-
 ## Other resources
 
 - Comprehensive functional programming library for Dart: https://github.com/SandroMaglione/fpdart.
@@ -51,4 +47,3 @@ Detailed API documentation can be found on [pub.dev](https://pub.dev/documentati
 
 ## License
 This project is [MIT licensed](https://github.com/arafatamim/deferred_type/blob/main/LICENSE).
-
