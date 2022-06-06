@@ -4,6 +4,9 @@
 
 Modeling asynchronous data in Dart made easy. This package also provides various useful helper functions for transforming and querying the contained values.
 
+**Flutter:** Package [deferred_type_flutter](https://pub.dev/packages/deferred_type_flutter) contains `FutureBuilder2`,
+an alternative "FutureBuilder" which is simpler to use than the bundled one provided by default in Flutter.
+
 ## Examples
 
 ```dart

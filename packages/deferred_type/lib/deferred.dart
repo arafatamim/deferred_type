@@ -67,6 +67,7 @@ abstract class Deferred<T> {
     }
   }
 
+  /// Transforms the contained `success` value based on the result of the callback function [f].
   Deferred<R> mapSuccess<R>(
     R Function(T result) f,
   ) {
@@ -83,7 +84,10 @@ abstract class Deferred<T> {
     }
   }
 
-  Deferred<T> mapError(Object Function(Object error) f) {
+  /// Transforms the contained `error` value based on the result of the callback function [f].
+  Deferred<T> mapError(
+    Object Function(Object error) f,
+  ) {
     if (this is _InProgress) {
       return Deferred.inProgress();
     } else if (this is _Error) {
@@ -94,6 +98,56 @@ abstract class Deferred<T> {
       return Deferred.success(success.results);
     } else {
       return Deferred.idle();
+    }
+  }
+
+  /// Transforms both the contained `success` and `error` values
+  /// based on the results of the callback functions [success] and [error] respectively.
+  Deferred<R> mapBoth<R>({
+    required R Function(T result) success,
+    required Object Function(Object error) error,
+  }) {
+    if (this is _InProgress) {
+      return Deferred.inProgress();
+    } else if (this is _Error) {
+      final e = this as _Error;
+      return Deferred.error(error(e.error), e.stackTrace);
+    } else if (this is _Success) {
+      final s = this as _Success;
+      return Deferred.success(success(s.results));
+    } else {
+      return Deferred.idle();
+    }
+  }
+
+  /// Chains two [Deferred] values in sequence,
+  /// using the result of callback [f] to determine the next value.
+  Deferred<R> flatMap<R>(
+    Deferred<R> Function(T result) f,
+  ) {
+    return this.when(
+      success: (data) => f(data),
+      error: (error, stackTrace) => _Error<R>(error, stackTrace),
+      inProgress: () => _InProgress<R>(),
+      idle: () => _Idle<R>(),
+    );
+  }
+
+  /// Returns the `success` value if available, or the provided [defaultValue].
+  T getOrElse(T defaultValue) {
+    return this.maybeWhen(
+      orElse: () => defaultValue,
+      success: (data) => data,
+    );
+  }
+
+  /// Returns the `success` value if available, or throws an exception.
+  T getOrThrow() {
+    if (this is _Success) {
+      final success = this as _Success;
+      return success.results;
+    } else {
+      throw Exception("getOrException() called on non-success value!");
     }
   }
 }

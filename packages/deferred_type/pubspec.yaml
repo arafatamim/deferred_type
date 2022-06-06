@@ -1,5 +1,5 @@
 name: deferred_type
-description: Dart type for working with asynchronous data.
+description: Dart algebraic data type and helper functions for working with asynchronous data.
 homepage: https://github.com/arafatamim/deferred_type/tree/main/packages/deferred_type
 version: 3.0.0
 
