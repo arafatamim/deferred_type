@@ -1,3 +1,6 @@
+## 3.1.0
+* Added `mapBoth`, `flatMap`, `getOrDefault`, `getOrThrow` methods.
+
 ## 3.0.0
 * Removed Flutter dependency and `FutureBuilder2` widget.
 
