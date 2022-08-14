@@ -1,4 +1,6 @@
-include: package:flutter_lints/flutter.yaml
-
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+include: package:lints/recommended.yaml
+analyzer:
+  language:
+    strict-raw-types: true
+    strict-casts: true
+    strict-inference: true

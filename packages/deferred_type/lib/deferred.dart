@@ -1,9 +1,14 @@
+import 'package:collection/collection.dart';
+
 abstract class Deferred<T> {
   const Deferred();
-  factory Deferred.success(T result) = _Success<T>;
-  factory Deferred.error(Object error, StackTrace? stackTrace) = _Error<T>;
-  factory Deferred.inProgress() = _InProgress<T>;
-  factory Deferred.idle() = _Idle<T>;
+  const factory Deferred.success(T result) = _Success<T>;
+  const factory Deferred.error(
+    Object error,
+    StackTrace? stackTrace,
+  ) = _Error<T>;
+  const factory Deferred.inProgress() = _InProgress<T>;
+  const factory Deferred.idle() = _Idle<T>;
 
   /// Similar to [when], but doesn't require all states to be explicitly handled,
   /// therefore the [orElse] callback must be provided as a fallback handler.
@@ -77,7 +82,7 @@ abstract class Deferred<T> {
       final err = this as _Error;
       return Deferred.error(err.error, err.stackTrace);
     } else if (this is _Success) {
-      final success = this as _Success;
+      final success = this as _Success<T>;
       return Deferred.success(f(success.results));
     } else {
       return Deferred.idle();
@@ -94,7 +99,7 @@ abstract class Deferred<T> {
       final err = this as _Error;
       return Deferred.error(f(err.error), err.stackTrace);
     } else if (this is _Success) {
-      final success = this as _Success;
+      final success = this as _Success<T>;
       return Deferred.success(success.results);
     } else {
       return Deferred.idle();
@@ -113,7 +118,7 @@ abstract class Deferred<T> {
       final e = this as _Error;
       return Deferred.error(error(e.error), e.stackTrace);
     } else if (this is _Success) {
-      final s = this as _Success;
+      final s = this as _Success<T>;
       return Deferred.success(success(s.results));
     } else {
       return Deferred.idle();
@@ -125,7 +130,7 @@ abstract class Deferred<T> {
   Deferred<R> flatMap<R>(
     Deferred<R> Function(T result) f,
   ) {
-    return this.when(
+    return when(
       success: (data) => f(data),
       error: (error, stackTrace) => _Error<R>(error, stackTrace),
       inProgress: () => _InProgress<R>(),
@@ -135,7 +140,7 @@ abstract class Deferred<T> {
 
   /// Returns the `success` value if available, or the provided [defaultValue].
   T getOrElse(T defaultValue) {
-    return this.maybeWhen(
+    return maybeWhen(
       orElse: () => defaultValue,
       success: (data) => data,
     );
@@ -144,7 +149,7 @@ abstract class Deferred<T> {
   /// Returns the `success` value if available, or throws an exception.
   T getOrThrow() {
     if (this is _Success) {
-      final success = this as _Success;
+      final success = this as _Success<T>;
       return success.results;
     } else {
       throw Exception("getOrException() called on non-success value!");
@@ -156,14 +161,41 @@ class _Success<T> extends Deferred<T> {
   final T _results;
   T get results => _results;
   const _Success(this._results);
+
+  @override
+  bool operator ==(Object other) {
+    return other is _Success<T> &&
+        (identical(other._results, _results) ||
+            const DeepCollectionEquality().equals(other._results, _results));
+  }
+
+  @override
+  int get hashCode =>
+      runtimeType.hashCode ^ const DeepCollectionEquality().hash(_results);
 }
 
 class _Idle<T> extends Deferred<T> {
   const _Idle();
+
+  @override
+  bool operator ==(Object other) {
+    return (other is _Idle<T>);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
 }
 
 class _InProgress<T> extends Deferred<T> {
   const _InProgress();
+
+  @override
+  bool operator ==(Object other) {
+    return (other is _InProgress<T>);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
 }
 
 class _Error<T> extends Deferred<T> {
@@ -173,4 +205,21 @@ class _Error<T> extends Deferred<T> {
   Object get error => _error;
   StackTrace? get stackTrace => _stackTrace;
   const _Error(this._error, this._stackTrace);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is _Error<T> &&
+            (identical(other.error, error) ||
+                const DeepCollectionEquality().equals(other.error, error)) &&
+            (identical(other.stackTrace, stackTrace) ||
+                const DeepCollectionEquality()
+                    .equals(other.stackTrace, stackTrace)));
+  }
+
+  @override
+  int get hashCode =>
+      runtimeType.hashCode ^
+      const DeepCollectionEquality().hash(error) ^
+      const DeepCollectionEquality().hash(stackTrace);
 }
