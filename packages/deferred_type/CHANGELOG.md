@@ -1,3 +1,6 @@
+## 3.2.0
+* Added equality checks, so `Deferred.success([]) == Deferred.success([])`.
+
 ## 3.1.0
 * Added `mapBoth`, `flatMap`, `getOrDefault`, `getOrThrow` methods.
 
